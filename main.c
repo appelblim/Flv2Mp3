@@ -37,6 +37,7 @@ typedef struct
 	const gchar *quality;
 	GtkWidget *parent;
 	GtkLabel *label_pwd;
+	GtkLabel *label_pwd_meta;
  
     /* Timeout source id. */
     gint timeout_id;
@@ -58,7 +59,7 @@ int main (int argc, char *argv[])
   GtkWidget *label1, *label2, *btn_close, *btn_go, *btn_meta_ok, *meta_table, *meta_track_title, *meta_track_artist, *meta_track_year, *meta_track_genre, *meta_track_album, *label_title, *label_artist, *label_quality;
   GtkWidget *label_kbs, *meta_vbox, *main_vbox, *main_hbox, *main_hbox2, *combobox_quality, *picker, *label_pwd, *text_view_ffmpeg, *sw, *vpaned;
 	GtkWidget *about_vbox, *label3, *about_text;
-	GtkWidget *label_genre, *label_year, *label_album;
+	GtkWidget *label_genre, *label_year, *label_album, *label_pwd_meta;
   Data *data;
 	GtkTextBuffer *about_buffer;
 	GtkTextIter iter;
@@ -102,8 +103,12 @@ int main (int argc, char *argv[])
   label_kbs = gtk_label_new( " kb/s" );
   label_quality = gtk_label_new( "Quality: " );
   label_pwd = gtk_label_new( "" );
-  data->quality = "256";
-  data->label_pwd = GTK_LABEL(label_pwd);
+	label_pwd_meta = gtk_label_new( "" );
+	gtk_label_set_selectable( GTK_LABEL(label_pwd_meta), TRUE );
+	
+	data->quality = "256";
+	data->label_pwd = GTK_LABEL(label_pwd);
+	data->label_pwd_meta = GTK_LABEL(label_pwd_meta);
 
   picker = gtk_file_chooser_button_new ("Pick a File", GTK_FILE_CHOOSER_ACTION_OPEN);
   gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER (picker), g_get_home_dir() );
@@ -134,7 +139,7 @@ int main (int argc, char *argv[])
 	gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW(about_text), GTK_WRAP_WORD );
 	about_buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW( about_text ) );
 	gtk_text_buffer_get_iter_at_offset (about_buffer, &iter, 0);
-	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.2 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.0-ugly Plugins \n\n Licence: GPL", -1);
+	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.2 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.x-ugly Plugins \n\n Licence: GPL", -1);
 	
   gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "192" );
   gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "256" );  
@@ -151,16 +156,16 @@ int main (int argc, char *argv[])
 	gtk_box_pack_start( GTK_BOX(main_vbox), vpaned, TRUE, TRUE, 0 );
   
 	/* Pack the table. */
-	gtk_table_attach( GTK_TABLE(meta_table), label_title, 0, 1, 1, 2, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), label_artist, 0, 1, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_title, 1, 2, 1, 2, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_artist, 1, 2, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), label_album, 0, 1, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), label_genre, 0, 1, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), label_year, 0, 1, 5, 6, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_year, 1, 2, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_genre, 1, 2, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_album, 1, 2, 5, 6, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), label_title, 0, 1, 0, 1, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), label_artist, 0, 1, 1, 2, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_title, 1, 2, 0,1, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_artist, 1, 2, 1, 2, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), label_album, 0, 1, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), label_genre, 0, 1, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), label_year, 0, 1, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_year, 1, 2, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_genre, 1, 2, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_album, 1, 2, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
 
   /* Set the spacings for the table. */
   gtk_table_set_row_spacings(GTK_TABLE(meta_table), 5);
@@ -198,6 +203,7 @@ int main (int argc, char *argv[])
 	gtk_box_pack_start( GTK_BOX(main_vbox), main_hbox, TRUE, TRUE, 0 );
 
 	/* Pack the table and the button into the meta_vbox. */
+	gtk_box_pack_start(GTK_BOX(meta_vbox), label_pwd_meta, TRUE, TRUE, 0 );
 	gtk_box_pack_start(GTK_BOX(meta_vbox), meta_table, TRUE, TRUE, 0 );
 	gtk_box_pack_start(GTK_BOX(meta_vbox), btn_meta_ok, FALSE, FALSE, 0 );
 
@@ -324,6 +330,7 @@ static void file_changed( GtkFileChooser *picker, Data *data )
 {
 	gchar *file = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(picker) );
 	gtk_label_set_text( data->label_pwd, file );
+	gtk_label_set_text( data->label_pwd_meta, g_path_get_basename(file) );
 	data->inputfilename = file;
 }
 
