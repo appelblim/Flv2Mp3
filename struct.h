@@ -4,7 +4,8 @@
 typedef struct 
 {
     /* Data struct containing data to be passed around
-	 * between functions. */
+	 * between functions - guess this is not state of
+	 * the art but who cares. */
     GtkTextBuffer *out;
     GtkTextBuffer *err;
 	const gchar *inputfilename;

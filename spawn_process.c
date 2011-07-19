@@ -69,6 +69,7 @@ gint button_clicked(GtkButton *button, Data *data)
     g_io_add_watch( out_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_out_watch, data );
     g_io_add_watch( err_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_err_watch, data );
 	
+	/* Free stuff. */
 	g_free( outputfilename );
 	g_free( meta_title_conc );
 	g_free( meta_artist_conc );
