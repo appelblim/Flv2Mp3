@@ -82,6 +82,9 @@ int main (int argc, char *argv[])
 	label_pwd = gtk_label_new( "" );
 	label_pwd_meta = gtk_label_new( "" );
 	gtk_label_set_selectable( GTK_LABEL(label_pwd_meta), TRUE );
+	
+	/* Set the ellipsize mode - omit leading characters if the text is too long. */
+	gtk_label_set_ellipsize( GTK_LABEL(label_pwd), PANGO_ELLIPSIZE_START );
 
 	data->quality = "256";
 	data->label_pwd = GTK_LABEL(label_pwd);
@@ -117,8 +120,9 @@ int main (int argc, char *argv[])
 	gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW(about_text), GTK_WRAP_WORD );
 	about_buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW( about_text ) );
 	gtk_text_buffer_get_iter_at_offset (about_buffer, &iter, 0);
-	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.2 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.x-ugly Plugins \n\n Licence: GPL", -1);
+	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.2.1 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.x-ugly Plugins \n\n Licence: GPL", -1);
 
+	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "128" );
 	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "192" );
 	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "256" );  
 	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "320" );
@@ -196,7 +200,9 @@ int main (int argc, char *argv[])
 	gtk_container_add (GTK_CONTAINER (window), notebook);
 	gtk_widget_show_all(window);
 
+
 	gtk_main();
+	
 
 	g_slice_free( Data, data );
 

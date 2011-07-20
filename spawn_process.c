@@ -47,7 +47,8 @@ gint button_clicked(GtkButton *button, Data *data)
 	
 	GSpawnFlags flags = G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_SEARCH_PATH;
  
-    /* Spawn child process */
+ 
+    /* Spawn child process. */
     ret = g_spawn_async_with_pipes( NULL, argv, NULL, flags, NULL,
                                     NULL, &pid, NULL, &out, &err, NULL );
 
@@ -65,7 +66,7 @@ gint button_clicked(GtkButton *button, Data *data)
     out_ch = g_io_channel_unix_new( out );
     err_ch = g_io_channel_unix_new( err );
  
-    /* Add watches to channels */
+    /* Add watches to channels. */
     g_io_add_watch( out_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_out_watch, data );
     g_io_add_watch( err_ch, G_IO_IN | G_IO_HUP, (GIOFunc)cb_err_watch, data );
 	
