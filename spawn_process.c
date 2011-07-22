@@ -21,14 +21,19 @@ gint button_clicked(GtkButton *button, Data *data)
 	gchar *meta_year_conc = g_strconcat( "year=", data->year, NULL );
 	gchar *quality_conc = g_strconcat( data->quality, "k", NULL );
 	GtkWidget *dialog;
-
+	
+	/* Get the filename for the output. */
+	data->outputfilename = (gchar*)gtk_entry_get_text(GTK_ENTRY(data->output_entry));
+	if( g_utf8_strlen( data->outputfilename, 1) == 0 )
+		data->outputfilename = g_strconcat( data->inputfilename, ".mp3", NULL );
+	
 
 	GPid        pid;
     gchar      *argv[] = { "ffmpeg", "-i", (gchar*)data->inputfilename, "-metadata",
 							meta_title_conc, "-metadata",
 							meta_artist_conc, "-metadata", meta_album_conc, "-metadata",
 							meta_genre_conc, "-metadata", meta_year_conc, "-ab", quality_conc,
-							outputfilename, NULL };
+							data->outputfilename, NULL };
     gint        out,
                 err;
     GIOChannel *out_ch,

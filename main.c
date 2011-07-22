@@ -37,6 +37,7 @@ int main (int argc, char *argv[])
 	GtkWidget *meta_track_artist, *meta_track_year, *meta_track_genre, *meta_track_album, *label_title, *label_artist, *label_quality;
 	GtkWidget *label_kbs, *meta_vbox, *main_vbox, *main_hbox, *main_hbox2, *combobox_quality, *picker, *label_pwd, *text_view_ffmpeg, *sw, *vpaned;
 	GtkWidget *about_vbox, *label3, *about_text;
+	GtkWidget *label_output_file, *output_file, *main_hbox_output;
 	GtkWidget *label_genre, *label_year, *label_album, *label_pwd_meta;
 	Data *data;
 	GtkTextBuffer *about_buffer;
@@ -58,6 +59,11 @@ int main (int argc, char *argv[])
 	label1 = gtk_label_new ("Transcode");
 	label2 = gtk_label_new ("Metadata");
 	label3 = gtk_label_new ("About");
+	
+	label_output_file = gtk_label_new( "Output:" );
+	output_file = gtk_entry_new();
+	main_hbox_output = gtk_hbox_new( FALSE, 5 );
+	data->output_entry = GTK_ENTRY(output_file);
 
 	combobox_quality = gtk_combo_box_text_new();
 	btn_close = gtk_button_new_from_stock( GTK_STOCK_CLOSE );
@@ -90,8 +96,9 @@ int main (int argc, char *argv[])
 	data->label_pwd = GTK_LABEL(label_pwd);
 	data->label_pwd_meta = GTK_LABEL(label_pwd_meta);
 
+	/* The file picker. */
 	picker = gtk_file_chooser_button_new ("Pick a File", GTK_FILE_CHOOSER_ACTION_OPEN);
-	gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER (picker), g_get_home_dir() );
+	gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER (picker), g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD) );
 
 
 	text_view_ffmpeg = gtk_text_view_new();
@@ -120,7 +127,7 @@ int main (int argc, char *argv[])
 	gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW(about_text), GTK_WRAP_WORD );
 	about_buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW( about_text ) );
 	gtk_text_buffer_get_iter_at_offset (about_buffer, &iter, 0);
-	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.2.1 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.x-ugly Plugins \n\n Licence: GPL", -1);
+	gtk_text_buffer_insert (about_buffer, &iter, "\nFlv2Mp3 - 1.3 \n\n by appelblim \n 2011 \n\n requires any recent FFmpeg version & gstreamer1.x-ugly Plugins \n\n Licence: GPL", -1);
 
 	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "128" );
 	gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT(combobox_quality), "192" );
@@ -145,9 +152,9 @@ int main (int argc, char *argv[])
 	gtk_table_attach( GTK_TABLE(meta_table), label_album, 0, 1, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
 	gtk_table_attach( GTK_TABLE(meta_table), label_genre, 0, 1, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
 	gtk_table_attach( GTK_TABLE(meta_table), label_year, 0, 1, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_year, 1, 2, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_year, 1, 2, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
 	gtk_table_attach( GTK_TABLE(meta_table), meta_track_genre, 1, 2, 3, 4, GTK_EXPAND, GTK_SHRINK, 0, 0 );
-	gtk_table_attach( GTK_TABLE(meta_table), meta_track_album, 1, 2, 4, 5, GTK_EXPAND, GTK_SHRINK, 0, 0 );
+	gtk_table_attach( GTK_TABLE(meta_table), meta_track_album, 1, 2, 2, 3, GTK_EXPAND, GTK_SHRINK, 0, 0 );
 
 	/* Set the spacings for the table. */
 	gtk_table_set_row_spacings(GTK_TABLE(meta_table), 5);
@@ -174,6 +181,9 @@ int main (int argc, char *argv[])
 	/* Pack the table and the button into the main_vbox. */
 	gtk_box_pack_start( GTK_BOX(main_hbox), btn_close, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_hbox), btn_go, TRUE, TRUE, 0 );
+	
+	gtk_box_pack_start( GTK_BOX(main_hbox_output), label_output_file, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX(main_hbox_output), output_file, TRUE, TRUE, 0 );
 
 	gtk_box_pack_start( GTK_BOX(main_hbox2), label_quality, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_hbox2), combobox_quality, TRUE, TRUE, 0 );
@@ -182,6 +192,7 @@ int main (int argc, char *argv[])
 	gtk_box_pack_start( GTK_BOX(main_vbox), label_pwd, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_vbox), sw, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_vbox), main_hbox2, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX(main_vbox), main_hbox_output, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_vbox), main_hbox, TRUE, TRUE, 0 );
 
 	/* Pack the table and the button into the meta_vbox. */
@@ -231,12 +242,18 @@ static void meta_okay_clicked( GtkButton *btn_meta_ok, Data *data )
 	GtkEntry *entry4 = g_object_get_data(G_OBJECT(btn_meta_ok), "entry4");
 	GtkEntry *entry5 = g_object_get_data(G_OBJECT(btn_meta_ok), "entry5");
 
-
-	data->title = gtk_entry_get_text(GTK_ENTRY(entry1));
-	data->artist = gtk_entry_get_text(GTK_ENTRY(entry2));
-	data->album = gtk_entry_get_text(GTK_ENTRY(entry5));
-	data->genre = gtk_entry_get_text(GTK_ENTRY(entry4));
-	data->year = gtk_entry_get_text(GTK_ENTRY(entry3));
+	data->title = (gchar*)gtk_entry_get_text(GTK_ENTRY(entry1));
+	data->artist = (gchar*)gtk_entry_get_text(GTK_ENTRY(entry2));
+	data->album = (gchar*)gtk_entry_get_text(GTK_ENTRY(entry3));
+	data->genre = (gchar*)gtk_entry_get_text(GTK_ENTRY(entry4));
+	data->year = (gchar*)gtk_entry_get_text(GTK_ENTRY(entry5));
+	
+	/* If $TITLE and $ARTIST are not void - set the outputfilename to "$PATH/$ARTIST - $TITLE.mp3". */
+	if( g_utf8_strlen( data->artist, 1) != 0 && g_utf8_strlen( data->title, 1) != 0 )
+	{
+		gchar *outputfilename = g_strconcat( data->inputfile_directory, "/", data->artist, " - ", data->title, ".mp3", NULL );
+		gtk_entry_set_text( data->output_entry, outputfilename );
+	}
 }
 
 
@@ -244,7 +261,13 @@ static void meta_okay_clicked( GtkButton *btn_meta_ok, Data *data )
 static void file_changed( GtkFileChooser *picker, Data *data )
 {
 	gchar *file = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(picker) );
+	gchar *directory = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER(picker) );
+	gchar *outputfilename = g_strconcat( file, ".mp3", NULL );
+	
 	gtk_label_set_text( data->label_pwd, file );
 	gtk_label_set_text( data->label_pwd_meta, g_path_get_basename(file) );
 	data->inputfilename = file;
+	data->inputfile_directory = directory;
+	
+	gtk_entry_set_text( data->output_entry, outputfilename );
 }
