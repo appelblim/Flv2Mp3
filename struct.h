@@ -15,6 +15,7 @@ typedef struct
 	gchar *title;
 	gchar *artist;
 	gchar *album;
+	GtkWidget *spinner;
 	gchar *genre;
 	gchar *year;
 	const gchar *quality;

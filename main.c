@@ -37,7 +37,7 @@ int main (int argc, char *argv[])
 	GtkWidget *meta_track_artist, *meta_track_year, *meta_track_genre, *meta_track_album, *label_title, *label_artist, *label_quality;
 	GtkWidget *label_kbs, *meta_vbox, *main_vbox, *main_hbox, *main_hbox2, *combobox_quality, *picker, *label_pwd, *text_view_ffmpeg, *sw, *vpaned;
 	GtkWidget *about_vbox, *label3, *about_text;
-	GtkWidget *label_output_file, *output_file, *main_hbox_output;
+	GtkWidget *label_output_file, *output_file, *main_hbox_output, *spinner;
 	GtkWidget *label_genre, *label_year, *label_album, *label_pwd_meta;
 	Data *data;
 	GtkTextBuffer *about_buffer;
@@ -59,6 +59,9 @@ int main (int argc, char *argv[])
 	label1 = gtk_label_new ("Transcode");
 	label2 = gtk_label_new ("Metadata");
 	label3 = gtk_label_new ("About");
+	
+	spinner = gtk_spinner_new();
+	data->spinner = spinner;
 	
 	label_output_file = gtk_label_new( "Output:" );
 	output_file = gtk_entry_new();
@@ -180,6 +183,7 @@ int main (int argc, char *argv[])
 
 	/* Pack the table and the button into the main_vbox. */
 	gtk_box_pack_start( GTK_BOX(main_hbox), btn_close, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX(main_hbox), spinner, TRUE, TRUE, 0 );
 	gtk_box_pack_start( GTK_BOX(main_hbox), btn_go, TRUE, TRUE, 0 );
 	
 	gtk_box_pack_start( GTK_BOX(main_hbox_output), label_output_file, TRUE, TRUE, 0 );
@@ -210,6 +214,8 @@ int main (int argc, char *argv[])
 
 	gtk_container_add (GTK_CONTAINER (window), notebook);
 	gtk_widget_show_all(window);
+	
+	gtk_widget_set_visible(data->spinner, FALSE);
 
 
 	gtk_main();
@@ -264,10 +270,22 @@ static void file_changed( GtkFileChooser *picker, Data *data )
 	gchar *directory = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER(picker) );
 	gchar *outputfilename = g_strconcat( file, ".mp3", NULL );
 	
+	/* Dunno whether the "if" is needed - note: this does not purge the text from
+	 * the entry boxes on the meta page, just the saved data ! */
+	if( file != data->inputfilename )
+	{
+	data->title = NULL;
+	data->artist = NULL;
+	data->album = NULL;
+	data->genre = NULL;
+	data->year = NULL;
+	}
+	
 	gtk_label_set_text( data->label_pwd, file );
 	gtk_label_set_text( data->label_pwd_meta, g_path_get_basename(file) );
 	data->inputfilename = file;
 	data->inputfile_directory = directory;
 	
+	/* Set the default output filename. */
 	gtk_entry_set_text( data->output_entry, outputfilename );
 }

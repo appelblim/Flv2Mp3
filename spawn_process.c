@@ -27,6 +27,8 @@ gint button_clicked(GtkButton *button, Data *data)
 	if( g_utf8_strlen( data->outputfilename, 1) == 0 )
 		data->outputfilename = g_strconcat( data->inputfilename, ".mp3", NULL );
 	
+	gtk_widget_set_visible(data->spinner, TRUE);
+	gtk_spinner_start( GTK_SPINNER(data->spinner) );
 
 	GPid        pid;
     gchar      *argv[] = { "ffmpeg", "-i", (gchar*)data->inputfilename, "-metadata",
@@ -42,8 +44,10 @@ gint button_clicked(GtkButton *button, Data *data)
 
 	if( g_utf8_strlen( data->inputfilename, 1 ) == 0 )
 	{
+		gtk_spinner_stop( GTK_SPINNER(data->spinner) );
 		dialog = gtk_message_dialog_new (GTK_WINDOW(data->parent), GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "Pick a file to transcode" );
-  
+  		
+  		gtk_widget_set_visible(data->spinner, FALSE);
 		gtk_window_set_title (GTK_WINDOW (dialog), "Error");
 		gtk_dialog_run (GTK_DIALOG (dialog));
 		gtk_widget_destroy (dialog);
@@ -92,11 +96,14 @@ gint button_clicked(GtkButton *button, Data *data)
 static void cb_child_watch( GPid pid, gint status, Data *data )
 {
 	GtkWidget *dialog;
-    /* Remove timeout callback */
+    /* Remove timeout callback. */
     g_source_remove( data->timeout_id );
 
-    /* Close pid */
+    /* Close pid. */
     g_spawn_close_pid( pid );
+    
+    gtk_spinner_stop( GTK_SPINNER(data->spinner) );
+    gtk_widget_set_visible(data->spinner, FALSE);
 
 	if( status == 0 )
 	{
